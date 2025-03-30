@@ -13,31 +13,41 @@
         }
 
         var isDrawing = false;
-        var brushColor = '#000000'; // Default to black
+        var brushColor = '#000000';
         var brushSize = 5;
+        var imageData = null;
 
-        // Function to set canvas size
-        function setCanvasSize() {
-            canvas.width = document.getElementById('canvasContainer').offsetWidth;
-            canvas.height = canvas.offsetWidth / 3 * 5;
-        }
-
-        // Set initial canvas size
         setCanvasSize();
+        setBrushColor(brushColor);
+        setBrushSize(brushSize);
 
-        // Add resize event listener
-        window.addEventListener('resize', setCanvasSize);
+        function setCanvasSize() {
+            var container = document.getElementById('canvasContainer');
+            var originalWidth = canvas.width;
+            var originalHeight = canvas.height;
+            var newWidth = container.offsetWidth;
+            var newHeight = newWidth / 5 * 3;
 
-        // Function to clear the canvas
-        function clearCanvas() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (imageData) {
+                var tempCanvas = document.createElement('canvas');
+                var tempCtx = tempCanvas.getContext('2d');
+                tempCanvas.width = newWidth;
+                tempCanvas.height = newHeight;
+                tempCtx.drawImage(canvas, 0, 0, originalWidth, originalHeight, 0, 0, newWidth, newHeight);
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                ctx.drawImage(tempCanvas, 0, 0);
+            } else {
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+            }
+            imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         }
 
-        // Function to set initial brush color and size
         function setBrushColor(color) {
             brushColor = color;
-            ctx.strokeStyle = color;
-            ctx.fillStyle = color;
+            ctx.strokeStyle = brushColor;
+            ctx.fillStyle = brushColor;
         }
 
         function setBrushSize(size) {
@@ -45,15 +55,20 @@
             ctx.lineWidth = size;
         }
 
-        // Set initial brush color and size
-        setBrushColor(brushColor);
-        setBrushSize(brushSize);
+        function getMousePos(canvas, evt) {
+            var rect = canvas.getBoundingClientRect();
+            return {
+                x: evt.clientX - rect.left,
+                y: evt.clientY - rect.top
+            };
+        }
 
         // Mouse event listeners
         canvas.addEventListener('mousedown', function(e) {
             isDrawing = true;
+            var pos = getMousePos(canvas, e);
             ctx.beginPath();
-            ctx.moveTo(e.offsetX, e.offsetY);
+            ctx.moveTo(pos.x, pos.y);
             e.preventDefault();
             ctx.strokeStyle = brushColor;
             ctx.fillStyle = brushColor;
@@ -137,8 +152,12 @@
             clearCanvas();
         });
 
-        // Function to add canvas data to Qualtrics embedded data or return base 64
-        function addCanvasDataToEmbeddedData() {
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // Function to add canvas data to Qualtrics embedded data
+        function saveCanvasData() {
             const myCanvas = document.getElementById('drawingCanvas');
             if (myCanvas) {
                 const dataURL = myCanvas.toDataURL('image/png');
@@ -166,8 +185,11 @@
 
         // Add event listener to the save button.
         if (saveButton) {
-            saveButton.addEventListener("click", addCanvasDataToEmbeddedData);
+            saveButton.addEventListener("click", saveCanvasData);
         }
+
+        // Resize event listener to handle orientation changes
+        window.addEventListener('resize', setCanvasSize);
     }
 
     if (typeof Qualtrics !== 'undefined' && typeof Qualtrics.SurveyEngine !== 'undefined') {
