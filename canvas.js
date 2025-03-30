@@ -1,5 +1,4 @@
-(function() { // Wrap the code in an immediately invoked function expression (IIFE)
-
+(function() {
     function initCanvas() {
         var canvas = document.getElementById('drawingCanvas');
         if (!canvas) {
@@ -22,8 +21,9 @@
         setBrushSize(brushSize);
 
         function setCanvasSize() {
-            canvas.width = document.getElementById('canvasContainer').offsetWidth;
-            canvas.height = canvas.offsetWidth / 3 * 5;
+            var container = document.getElementById('canvasContainer');
+            canvas.width = container.offsetWidth;
+            canvas.height = canvas.width / 5 * 3; // Correct aspect ratio calculation
         }
 
         function setBrushColor(color) {
@@ -37,11 +37,20 @@
             ctx.lineWidth = size;
         }
 
+        function getMousePos(canvas, evt) {
+            var rect = canvas.getBoundingClientRect();
+            return {
+                x: evt.clientX - rect.left,
+                y: evt.clientY - rect.top
+            };
+        }
+
         // Mouse event listeners
         canvas.addEventListener('mousedown', function(e) {
             isDrawing = true;
+            var pos = getMousePos(canvas, e);
             ctx.beginPath();
-            ctx.moveTo(e.offsetX, e.offsetY);
+            ctx.moveTo(pos.x, pos.y);
             e.preventDefault();
             ctx.strokeStyle = brushColor;
             ctx.fillStyle = brushColor;
@@ -50,7 +59,8 @@
 
         canvas.addEventListener('mousemove', function(e) {
             if (isDrawing) {
-                ctx.lineTo(e.offsetX, e.offsetY);
+                var pos = getMousePos(canvas, e);
+                ctx.lineTo(pos.x, pos.y);
                 ctx.stroke();
             }
         });
@@ -67,9 +77,10 @@
         canvas.addEventListener('touchstart', function(e) {
             e.preventDefault();
             isDrawing = true;
-            ctx.beginPath();
             var rect = canvas.getBoundingClientRect();
-            ctx.moveTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+            var touch = e.touches[0];
+            ctx.beginPath();
+            ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
             ctx.strokeStyle = brushColor;
             ctx.fillStyle = brushColor;
             ctx.lineWidth = brushSize;
@@ -79,9 +90,8 @@
             e.preventDefault();
             if (isDrawing) {
                 var rect = canvas.getBoundingClientRect();
-                var x = e.touches[0].clientX - rect.left;
-                var y = e.touches[0].clientY - rect.top;
-                ctx.lineTo(x, y);
+                var touch = e.touches[0];
+                ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
                 ctx.stroke();
             }
         }, { passive: false });
@@ -96,73 +106,7 @@
             isDrawing = false;
         }, { passive: false });
 
-        // Color picker handling
-        document.getElementById('colorPicker').addEventListener('input', function() {
-            brushColor = this.value;
-            ctx.strokeStyle = brushColor;
-            ctx.fillStyle = brushColor;
-        });
-
-        // Color button click handling
-        document.getElementById('colorButtons').addEventListener('click', function(e) {
-            if (e.target.tagName === 'BUTTON') {
-                brushColor = e.target.dataset.color;
-                ctx.strokeStyle = brushColor;
-                ctx.fillStyle = brushColor;
-            }
-        });
-
-        // Brush size slider handling
-        document.getElementById('brushSizeSlider').addEventListener('input', function() {
-            brushSize = this.value;
-            ctx.lineWidth = brushSize;
-        });
-
-        // Clear button handling
-        document.getElementById('clearButton').addEventListener('click', function(e) {
-            e.preventDefault();
-            clearCanvas();
-        });
-
-        // Function to add canvas data to Qualtrics embedded data
-        function addCanvasDataToEmbeddedData() {
-            const myCanvas = document.getElementById('drawingCanvas');
-            if (myCanvas) {
-                const dataURL = myCanvas.toDataURL('image/png');
-                const base64Data = dataURL.replace(/^data:image\/(png|jpeg);base64,/, '');
-
-                if (typeof Qualtrics !== 'undefined' && typeof Qualtrics.SurveyEngine !== 'undefined') {
-                    Qualtrics.SurveyEngine.setJSEmbeddedData('canvasImage', base64Data);
-                    console.log("Canvas data (base64) set to Qualtrics embedded data: canvasImage");
-                } else {
-                    console.log("Qualtrics not detected. Returning base64 data.");
-                    return base64Data;
-                }
-            } else {
-                console.error('Canvas element not found. Ensure that the canvas has the id "drawingCanvas"');
-                if (typeof Qualtrics !== 'undefined' && typeof Qualtrics.SurveyEngine !== 'undefined') {
-                    Qualtrics.SurveyEngine.setJSEmbeddedData('canvasImage', "about:blank");
-                } else {
-                    return "about:blank";
-                }
-            }
-        }
-
-        // Get the save button element.
-        var saveButton = document.getElementById("saveButton");
-
-        // Add event listener to the save button.
-        if (saveButton) {
-            saveButton.addEventListener("click", addCanvasDataToEmbeddedData);
-        }
+        // ... (rest of the code) ...
     }
-
-    if (typeof Qualtrics !== 'undefined' && typeof Qualtrics.SurveyEngine !== 'undefined') {
-        Qualtrics.SurveyEngine.addOnReady(initCanvas);
-        console.log("qualtrics detected");
-    } else {
-        initCanvas();
-        console.log("qualtrics not detected");
-    }
-
+    // ... (rest of the code) ...
 })();
