@@ -169,6 +169,9 @@
         if (saveButton) {
             saveButton.addEventListener("click", addCanvasDataToEmbeddedData);
         }
+
+        // Resize event listener to handle orientation changes
+        window.addEventListener('resize', setCanvasSize);
     }
 
     if (typeof Qualtrics !== 'undefined' && typeof Qualtrics.SurveyEngine !== 'undefined') {
