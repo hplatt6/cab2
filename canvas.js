@@ -163,28 +163,34 @@
         }
 
         // Function to add canvas data to Qualtrics embedded data
-        function addCanvasDataToEmbeddedData() {
-            const myCanvas = document.getElementById('drawingCanvas');
-            if (myCanvas) {
-                const dataURL = myCanvas.toDataURL('image/png');
-                const base64Data = dataURL.replace(/^data:image\/(png|jpeg);base64,/, '');
-
-                if (typeof Qualtrics !== 'undefined' && typeof Qualtrics.SurveyEngine !== 'undefined') {
-                    Qualtrics.SurveyEngine.setJSEmbeddedData('canvasImage', base64Data);
-                    console.log("Canvas data (base64) set to Qualtrics embedded data: canvasImage");
-                } else {
-                    console.log("Qualtrics not detected. Returning base64 data.");
-                    return base64Data;
+        (function() {
+            function initCanvas() {
+                // ... (rest of the code) ...
+        
+                function addCanvasDataToEmbeddedData() {
+                    const myCanvas = document.getElementById('drawingCanvas');
+                    if (myCanvas) {
+                        const dataURL = myCanvas.toDataURL('image/png');
+                        const base64Data = dataURL.replace(/^data:image\/(png|jpeg);base64,/, '');
+        
+                        if (typeof Qualtrics !== 'undefined' && typeof Qualtrics.SurveyEngine !== 'undefined') {
+                            Qualtrics.SurveyEngine.setJSEmbeddedData('canvasImage', base64Data);
+                            console.log("Canvas data (base64) set to Qualtrics embedded data: canvasImage");
+                        } else {
+                            console.log("Qualtrics not detected. Returning base64 data.");
+                            console.log("Base64 Data:", base64Data); // Print the base64 data
+                            return base64Data;
+                        }
+                    } else {
+                        console.error('Canvas element not found. Ensure that the canvas has the id "drawingCanvas"');
+                        if (typeof Qualtrics !== 'undefined' && typeof Qualtrics.SurveyEngine !== 'undefined') {
+                            Qualtrics.SurveyEngine.setJSEmbeddedData('canvasImage', "about:blank");
+                        } else {
+                            return "about:blank";
+                        }
+                    }
                 }
-            } else {
-                console.error('Canvas element not found. Ensure that the canvas has the id "drawingCanvas"');
-                if (typeof Qualtrics !== 'undefined' && typeof Qualtrics.SurveyEngine !== 'undefined') {
-                    Qualtrics.SurveyEngine.setJSEmbeddedData('canvasImage', "about:blank");
-                } else {
-                    return "about:blank";
-                }
-            }
-        }
+        
 
         // Get the save button element.
         var saveButton = document.getElementById("saveButton");
