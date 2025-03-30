@@ -37,7 +37,7 @@
         height: 40px;
         border: none;
         padding: 0;
-        background: linear-gradient(to right, red, orange, yellow, green, blue, purple);
+        background-image: linear-gradient(to right, red, orange, yellow, green, blue, purple); /* Set gradient as background */
         -webkit-appearance: none;  /* Remove default appearance */
         -moz-appearance: none;
         appearance: none;
@@ -105,7 +105,7 @@
             <button data-color="pink" style="background-color: pink;"></button>
         </div>
         <div id="colorPickerContainer">
-          <input type="color" id="colorPicker" value="#000000">
+          <input type="color" id="colorPicker" value="#000000" style="background-image: linear-gradient(to right, red, orange, yellow, green, blue, purple);">
         </div>
         <button id="clearButton">Clear Canvas</button>
         <button id="saveButton">Save Drawing</button>
