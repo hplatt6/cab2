@@ -23,12 +23,10 @@
 
         function setCanvasSize() {
             var container = document.getElementById('canvasContainer');
+            imageData = ctx.getImageData(0, 0, canvas.width, canvas.height); // Save before resize
             canvas.width = container.offsetWidth;
             canvas.height = canvas.width / 5 * 3;
-            if (imageData) {
-                ctx.putImageData(imageData, 0, 0);
-            }
-            imageData = ctx.getImageData(0, 0, canvas.width, canvas.height); // save the image again.
+            ctx.putImageData(imageData, 0, 0); // Restore after resize
         }
 
         function setBrushColor(color) {
@@ -152,7 +150,7 @@
 
                 if (typeof Qualtrics !== 'undefined' && typeof Qualtrics.SurveyEngine !== 'undefined') {
                     Qualtrics.SurveyEngine.setJSEmbeddedData('canvasImage', base64Data);
-                    console.log("Canvas data (base64) set to Qualt-rics embedded data: canvasImage");
+                    console.log("Canvas data (base64) set to Qualtrics embedded data: canvasImage");
                 } else {
                     console.log("Qualtrics not detected. Returning base64 data.");
                     return base64Data;
