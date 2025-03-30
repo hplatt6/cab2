@@ -15,6 +15,7 @@
         var isDrawing = false;
         var brushColor = '#000000';
         var brushSize = 5;
+        var imageData = null;
 
         setCanvasSize();
         setBrushColor(brushColor);
@@ -22,14 +23,20 @@
 
         function setCanvasSize() {
             var container = document.getElementById('canvasContainer');
+            if (imageData) {
+                ctx.putImageData(imageData, 0, 0);
+            }
             canvas.width = container.offsetWidth;
             canvas.height = canvas.width / 5 * 3;
+            if (imageData) {
+                ctx.putImageData(imageData, 0, 0);
+            }
         }
 
         function setBrushColor(color) {
             brushColor = color;
-            ctx.strokeStyle = color;
-            ctx.fillStyle = color;
+            ctx.strokeStyle = brushColor;
+            ctx.fillStyle = brushColor;
         }
 
         function setBrushSize(size) {
@@ -171,7 +178,11 @@
         }
 
         // Resize event listener to handle orientation changes
-        window.addEventListener('resize', setCanvasSize);
+        window.addEventListener('resize', function() {
+            imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            setCanvasSize();
+            imageData = null;
+        });
     }
 
     if (typeof Qualtrics !== 'undefined' && typeof Qualtrics.SurveyEngine !== 'undefined') {
