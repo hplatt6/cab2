@@ -29,16 +29,11 @@
             var newHeight = newWidth / 5 * 3;
 
             if (imageData) {
-                // Create a temporary canvas to scale or crop the image
                 var tempCanvas = document.createElement('canvas');
                 var tempCtx = tempCanvas.getContext('2d');
                 tempCanvas.width = newWidth;
                 tempCanvas.height = newHeight;
-
-                // Draw the original image onto the temporary canvas
                 tempCtx.drawImage(canvas, 0, 0, originalWidth, originalHeight, 0, 0, newWidth, newHeight);
-
-                // Resize the main canvas and restore the scaled/cropped image
                 canvas.width = newWidth;
                 canvas.height = newHeight;
                 ctx.drawImage(tempCanvas, 0, 0);
@@ -46,7 +41,6 @@
                 canvas.width = newWidth;
                 canvas.height = newHeight;
             }
-            // save the new image data.
             imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         }
 
@@ -163,34 +157,29 @@
         }
 
         // Function to add canvas data to Qualtrics embedded data
-        (function() {
-            function initCanvas() {
-                // ... (rest of the code) ...
-        
-                function addCanvasDataToEmbeddedData() {
-                    const myCanvas = document.getElementById('drawingCanvas');
-                    if (myCanvas) {
-                        const dataURL = myCanvas.toDataURL('image/png');
-                        const base64Data = dataURL.replace(/^data:image\/(png|jpeg);base64,/, '');
-        
-                        if (typeof Qualtrics !== 'undefined' && typeof Qualtrics.SurveyEngine !== 'undefined') {
-                            Qualtrics.SurveyEngine.setJSEmbeddedData('canvasImage', base64Data);
-                            console.log("Canvas data (base64) set to Qualtrics embedded data: canvasImage");
-                        } else {
-                            console.log("Qualtrics not detected. Returning base64 data.");
-                            console.log("Base64 Data:", base64Data); // Print the base64 data
-                            return base64Data;
-                        }
-                    } else {
-                        console.error('Canvas element not found. Ensure that the canvas has the id "drawingCanvas"');
-                        if (typeof Qualtrics !== 'undefined' && typeof Qualtrics.SurveyEngine !== 'undefined') {
-                            Qualtrics.SurveyEngine.setJSEmbeddedData('canvasImage', "about:blank");
-                        } else {
-                            return "about:blank";
-                        }
-                    }
+        function addCanvasDataToEmbeddedData() {
+            const myCanvas = document.getElementById('drawingCanvas');
+            if (myCanvas) {
+                const dataURL = myCanvas.toDataURL('image/png');
+                const base64Data = dataURL.replace(/^data:image\/(png|jpeg);base64,/, '');
+
+                if (typeof Qualtrics !== 'undefined' && typeof Qualtrics.SurveyEngine !== 'undefined') {
+                    Qualtrics.SurveyEngine.setJSEmbeddedData('canvasImage', base64Data);
+                    console.log("Canvas data (base64) set to Qualtrics embedded data: canvasImage");
+                } else {
+                    console.log("Qualtrics not detected. Returning base64 data.");
+                    console.log("Base64 Data:", base64Data);
+                    return base64Data;
                 }
-        
+            } else {
+                console.error('Canvas element not found. Ensure that the canvas has the id "drawingCanvas"');
+                if (typeof Qualtrics !== 'undefined' && typeof Qualtrics.SurveyEngine !== 'undefined') {
+                    Qualtrics.SurveyEngine.setJSEmbeddedData('canvasImage', "about:blank");
+                } else {
+                    return "about:blank";
+                }
+            }
+        }
 
         // Get the save button element.
         var saveButton = document.getElementById("saveButton");
