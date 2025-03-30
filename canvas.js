@@ -23,10 +23,31 @@
 
         function setCanvasSize() {
             var container = document.getElementById('canvasContainer');
-            imageData = ctx.getImageData(0, 0, canvas.width, canvas.height); // Save before resize
-            canvas.width = container.offsetWidth;
-            canvas.height = canvas.width / 5 * 3;
-            ctx.putImageData(imageData, 0, 0); // Restore after resize
+            var originalWidth = canvas.width;
+            var originalHeight = canvas.height;
+            var newWidth = container.offsetWidth;
+            var newHeight = newWidth / 5 * 3;
+
+            if (imageData) {
+                // Create a temporary canvas to scale or crop the image
+                var tempCanvas = document.createElement('canvas');
+                var tempCtx = tempCanvas.getContext('2d');
+                tempCanvas.width = newWidth;
+                tempCanvas.height = newHeight;
+
+                // Draw the original image onto the temporary canvas
+                tempCtx.drawImage(canvas, 0, 0, originalWidth, originalHeight, 0, 0, newWidth, newHeight);
+
+                // Resize the main canvas and restore the scaled/cropped image
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                ctx.drawImage(tempCanvas, 0, 0);
+            } else {
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+            }
+            // save the new image data.
+            imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         }
 
         function setBrushColor(color) {
