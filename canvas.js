@@ -23,14 +23,12 @@
 
         function setCanvasSize() {
             var container = document.getElementById('canvasContainer');
-            if (imageData) {
-                ctx.putImageData(imageData, 0, 0);
-            }
             canvas.width = container.offsetWidth;
             canvas.height = canvas.width / 5 * 3;
             if (imageData) {
                 ctx.putImageData(imageData, 0, 0);
             }
+            imageData = ctx.getImageData(0, 0, canvas.width, canvas.height); // save the image again.
         }
 
         function setBrushColor(color) {
@@ -178,11 +176,7 @@
         }
 
         // Resize event listener to handle orientation changes
-        window.addEventListener('resize', function() {
-            imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            setCanvasSize();
-            imageData = null;
-        });
+        window.addEventListener('resize', setCanvasSize);
     }
 
     if (typeof Qualtrics !== 'undefined' && typeof Qualtrics.SurveyEngine !== 'undefined') {
