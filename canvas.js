@@ -33,13 +33,17 @@ window.onload = function() {
 
     function getMousePos(canvas, e) {
         var rect = canvas.getBoundingClientRect();
-        return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+        return {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+        };
     }
 
     canvas.addEventListener('mousedown', function(e) {
         isDrawing = true;
         ctx.beginPath();
-        ctx.moveTo(e.offsetX, e.offsetY);
+        var pos = getMousePos(canvas, e);
+        ctx.moveTo(pos.x, pos.y);
         e.preventDefault();
         ctx.strokeStyle = brushColor;
         ctx.fillStyle = brushColor;
@@ -48,7 +52,8 @@ window.onload = function() {
 
     canvas.addEventListener('mousemove', function(e) {
         if (isDrawing) {
-            ctx.lineTo(e.offsetX, e.offsetY);
+            var pos = getMousePos(canvas, e);
+            ctx.lineTo(pos.x, pos.y);
             ctx.stroke();
         }
     });
