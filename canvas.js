@@ -157,4 +157,19 @@ window.onload = function() {
     } else {
         console.error("Save button not found");
     }
+
+    // Orientation Change Handling
+    window.addEventListener('orientationchange', function() {
+        localStorage.setItem('canvasData', canvas.toDataURL());
+    });
+
+    // Restore Canvas Data
+    if (localStorage.getItem('canvasData')) {
+        var img = new Image();
+        img.onload = function() {
+            ctx.drawImage(img, 0, 0);
+            localStorage.removeItem('canvasData');
+        };
+        img.src = localStorage.getItem('canvasData');
+    }
 };
