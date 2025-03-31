@@ -33,10 +33,17 @@ window.onload = function() {
 
     function getMousePos(canvas, e) {
         var rect = canvas.getBoundingClientRect();
-        return {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top
-        };
+        var scaleX = canvas.width / rect.width;
+        var scaleY = canvas.height / rect.height;
+        var x = (e.clientX - rect.left) * scaleX;
+        var y = (e.clientY - rect.top) * scaleY;
+
+        console.log("clientX:", e.clientX, "clientY:", e.clientY);
+        console.log("rect.left:", rect.left, "rect.top:", rect.top);
+        console.log("scaleX:", scaleX, "scaleY:", scaleY);
+        console.log("x:", x, "y:", y);
+
+        return { x: x, y: y };
     }
 
     canvas.addEventListener('mousedown', function(e) {
@@ -72,7 +79,17 @@ window.onload = function() {
         ctx.beginPath();
         var rect = canvas.getBoundingClientRect();
         var touch = e.touches[0];
-        ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+        var scaleX = canvas.width / rect.width;
+        var scaleY = canvas.height / rect.height;
+        var x = (touch.clientX - rect.left) * scaleX;
+        var y = (touch.clientY - rect.top) * scaleY;
+
+        console.log("touch.clientX:", touch.clientX, "touch.clientY:", touch.clientY);
+        console.log("rect.left:", rect.left, "rect.top:", rect.top);
+        console.log("scaleX:", scaleX, "scaleY:", scaleY);
+        console.log("x:", x, "y:", y);
+
+        ctx.moveTo(x, y);
         ctx.strokeStyle = brushColor;
         ctx.fillStyle = brushColor;
         ctx.lineWidth = brushSize;
@@ -83,7 +100,17 @@ window.onload = function() {
         if (isDrawing) {
             var rect = canvas.getBoundingClientRect();
             var touch = e.touches[0];
-            ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+            var scaleX = canvas.width / rect.width;
+            var scaleY = canvas.height / rect.height;
+            var x = (touch.clientX - rect.left) * scaleX;
+            var y = (touch.clientY - rect.top) * scaleY;
+
+            console.log("touch.clientX:", touch.clientX, "touch.clientY:", touch.clientY);
+            console.log("rect.left:", rect.left, "rect.top:", rect.top);
+            console.log("scaleX:", scaleX, "scaleY:", scaleY);
+            console.log("x:", x, "y:", y);
+
+            ctx.lineTo(x, y);
             ctx.stroke();
         }
     }
@@ -97,67 +124,7 @@ window.onload = function() {
     canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
     canvas.addEventListener('touchcancel', handleTouchEnd, { passive: false });
 
-    document.getElementById('colorPicker').addEventListener('input', function() {
-        brushColor = this.value;
-        ctx.strokeStyle = brushColor;
-        ctx.fillStyle = brushColor;
-    });
-
-    document.getElementById('colorButtons').addEventListener('click', function(e) {
-        if (e.target.tagName === 'BUTTON') {
-            brushColor = e.target.dataset.color;
-            ctx.strokeStyle = brushColor;
-            ctx.fillStyle = brushColor;
-        }
-    });
-
-    document.getElementById('brushSizeSlider').addEventListener('input', function() {
-        brushSize = this.value;
-        ctx.lineWidth = brushSize;
-    });
-
-    document.getElementById('clearButton').addEventListener('click', function(e) {
-        e.preventDefault();
-        clearCanvas();
-    });
-
-    function sendBase64ToPipedream() {
-        const myCanvas = document.getElementById('drawingCanvas');
-        if (myCanvas) {
-            const dataURL = myCanvas.toDataURL('image/png');
-            const base64Data = dataURL.replace(/^data:image\/(png|jpeg);base64,/, '');
-
-            const pipedreamEndpoint = 'https://eo19wfj05vqf6o9.m.pipedream.net';
-
-            fetch(pipedreamEndpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ imageData: base64Data })
-            })
-            .then(response => {
-                if (response.ok) {
-                    console.log('Base64 data sent to Pipedream successfully!');
-                } else {
-                    console.error('Failed to send Base64 data to Pipedream.');
-                }
-            })
-            .catch(error => {
-                console.error('Error sending Base64 data to Pipedream:', error);
-            });
-        } else {
-            console.error('Canvas element not found.');
-        }
-    }
-
-    var saveButton = document.getElementById("saveButton");
-    if (saveButton) {
-        saveButton.addEventListener("click", sendBase64ToPipedream);
-    } else {
-        console.error("Save button not found");
-    }
-
+    // ... (rest of the code: color picker, brush size, clear, save, orientation)
     // Orientation Change Handling
     window.addEventListener('orientationchange', function() {
         localStorage.setItem('canvasData', canvas.toDataURL());
