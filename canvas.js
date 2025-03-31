@@ -188,21 +188,13 @@ window.onload = function() {
         var savedData = JSON.parse(localStorage.getItem('canvasData'));
         var img = new Image();
 
-        canvas.width = savedData.width;
-        canvas.height = savedData.height;
-
         img.onload = function() {
-            console.log("Image loaded, drawing to canvas.");
-            ctx.drawImage(img, 0, 0);
-            localStorage.removeItem('canvasData');
-            setupColorControls(); // Re-attach color controls
+            canvas.width = savedData.width;
+            canvas.height = savedData.height;
+            ctx.drawImage(img, 0, 0, savedData.width, savedData.height); // Redraw the image onto the resized canvas
+            setupColorControls();
         };
 
-        img.onerror = function() {
-            console.error("Error loading image from localStorage.");
-        };
-
-        console.log("Loading image from localStorage:", savedData.data);
         img.src = savedData.data;
     }
 };
