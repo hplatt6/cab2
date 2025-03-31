@@ -182,22 +182,30 @@
         }
 
         function handleOrientationChange() {
+            console.log("Orientation change detected");
             if (localStorage.getItem('canvasData')) {
                 var savedData = JSON.parse(localStorage.getItem('canvasData'));
                 var img = new Image();
 
                 img.onload = function() {
-                    setCanvasSize(); // Resize canvas
-                    ctx.drawImage(img, 0, 0, savedData.width, savedData.height, 0, 0, canvas.width, canvas.height); // Draw scaled image
+                    console.log("Image loaded, resizing canvas and redrawing");
+                    setTimeout(function() { // Add delay
+                        console.log("Delay finished, resizing canvas and redrawing");
+                        setCanvasSize(); // Resize canvas
+                        ctx.drawImage(img, 0, 0, savedData.width, savedData.height, 0, 0, canvas.width, canvas.height); // Draw scaled image
+                        console.log("Redraw complete");
+                    }, 100); // 100ms delay
                 };
 
                 img.src = savedData.data;
             } else {
+                console.log("No saved data, resizing canvas");
                 setCanvasSize(); // Just resize if no saved data
             }
         }
 
         window.addEventListener('orientationchange', function() {
+            console.log("Saving canvas data to local storage");
             localStorage.setItem('canvasData', JSON.stringify({
                 data: canvas.toDataURL(),
                 width: canvas.width,
@@ -207,6 +215,7 @@
         });
 
         if (localStorage.getItem('canvasData')) {
+            console.log("Restoring canvas data on initial load");
             handleOrientationChange(); // Restore on initial load
         }
     }
