@@ -38,11 +38,6 @@ window.onload = function() {
         var x = (e.clientX - rect.left) * scaleX;
         var y = (e.clientY - rect.top) * scaleY;
 
-        console.log("clientX:", e.clientX, "clientY:", e.clientY);
-        console.log("rect.left:", rect.left, "rect.top:", rect.top);
-        console.log("scaleX:", scaleX, "scaleY:", scaleY);
-        console.log("x:", x, "y:", y);
-
         return { x: x, y: y };
     }
 
@@ -84,11 +79,6 @@ window.onload = function() {
         var x = (touch.clientX - rect.left) * scaleX;
         var y = (touch.clientY - rect.top) * scaleY;
 
-        console.log("touch.clientX:", touch.clientX, "touch.clientY:", touch.clientY);
-        console.log("rect.left:", rect.left, "rect.top:", rect.top);
-        console.log("scaleX:", scaleX, "scaleY:", scaleY);
-        console.log("x:", x, "y:", y);
-
         ctx.moveTo(x, y);
         ctx.strokeStyle = brushColor;
         ctx.fillStyle = brushColor;
@@ -105,11 +95,6 @@ window.onload = function() {
             var x = (touch.clientX - rect.left) * scaleX;
             var y = (touch.clientY - rect.top) * scaleY;
 
-            console.log("touch.clientX:", touch.clientX, "touch.clientY:", touch.clientY);
-            console.log("rect.left:", rect.left, "rect.top:", rect.top);
-            console.log("scaleX:", scaleX, "scaleY:", scaleY);
-            console.log("x:", x, "y:", y);
-
             ctx.lineTo(x, y);
             ctx.stroke();
         }
@@ -124,19 +109,27 @@ window.onload = function() {
     canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
     canvas.addEventListener('touchcancel', handleTouchEnd, { passive: false });
 
-    // ... (rest of the code: color picker, brush size, clear, save, orientation)
+    // ... (rest of the code: color picker, brush size, clear, save)
+
     // Orientation Change Handling
     window.addEventListener('orientationchange', function() {
-        localStorage.setItem('canvasData', canvas.toDataURL());
+        localStorage.setItem('canvasData', JSON.stringify({
+            data: canvas.toDataURL(),
+            width: canvas.width,
+            height: canvas.height
+        }));
     });
 
     // Restore Canvas Data
     if (localStorage.getItem('canvasData')) {
+        var savedData = JSON.parse(localStorage.getItem('canvasData'));
         var img = new Image();
         img.onload = function() {
+            canvas.width = savedData.width;
+            canvas.height = savedData.height;
             ctx.drawImage(img, 0, 0);
             localStorage.removeItem('canvasData');
         };
-        img.src = localStorage.getItem('canvasData');
+        img.src = savedData.data;
     }
 };
