@@ -144,6 +144,15 @@
             clearCanvas();
         });
 
+        let qualtricsId = "unknown"; // Default value
+
+        if (typeof Qualtrics !== 'undefined' && typeof Qualtrics.SurveyEngine !== 'undefined') {
+            qualtricsId = Qualtrics.SurveyEngine.getEmbeddedData('qualtricsID'); // Replace 'qualtricsID' with your embedded data name.
+            console.log("Qualtrics ID: ", qualtricsId);
+        } else {
+            console.log("Qualtrics not detected. Using default ID.");
+        }
+
         function sendBase64ToPipedream() {
             const myCanvas = document.getElementById('drawingCanvas');
             if (myCanvas) {
@@ -157,7 +166,10 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ imageData: base64Data })
+                    body: JSON.stringify({
+                        imageData: base64Data,
+                        qualtricsId: qualtricsId
+                    })
                 })
                 .then(response => {
                     if (response.ok) {
