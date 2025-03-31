@@ -194,9 +194,8 @@
             var img = new Image();
 
             img.onload = function() {
-                canvas.width = savedData.width;
-                canvas.height = savedData.height;
-                ctx.drawImage(img, 0, 0, savedData.width, savedData.height);
+                setCanvasSize(); // Resize canvas
+                ctx.drawImage(img, 0, 0, savedData.width, savedData.height, 0, 0, canvas.width, canvas.height); // Draw scaled image
             };
 
             img.src = savedData.data;
