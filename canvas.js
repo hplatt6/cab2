@@ -181,24 +181,33 @@
             console.error("Save button not found");
         }
 
+        function handleOrientationChange() {
+            if (localStorage.getItem('canvasData')) {
+                var savedData = JSON.parse(localStorage.getItem('canvasData'));
+                var img = new Image();
+
+                img.onload = function() {
+                    setCanvasSize(); // Resize canvas
+                    ctx.drawImage(img, 0, 0, savedData.width, savedData.height, 0, 0, canvas.width, canvas.height); // Draw scaled image
+                };
+
+                img.src = savedData.data;
+            } else {
+                setCanvasSize(); // Just resize if no saved data
+            }
+        }
+
         window.addEventListener('orientationchange', function() {
             localStorage.setItem('canvasData', JSON.stringify({
                 data: canvas.toDataURL(),
                 width: canvas.width,
                 height: canvas.height
             }));
+            handleOrientationChange();
         });
 
         if (localStorage.getItem('canvasData')) {
-            var savedData = JSON.parse(localStorage.getItem('canvasData'));
-            var img = new Image();
-
-            img.onload = function() {
-                setCanvasSize(); // Resize canvas
-                ctx.drawImage(img, 0, 0, savedData.width, savedData.height, 0, 0, canvas.width, canvas.height); // Draw scaled image
-            };
-
-            img.src = savedData.data;
+            handleOrientationChange(); // Restore on initial load
         }
     }
 
