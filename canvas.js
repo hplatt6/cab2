@@ -192,10 +192,17 @@ window.onload = function() {
         canvas.height = savedData.height;
 
         img.onload = function() {
+            console.log("Image loaded, drawing to canvas.");
             ctx.drawImage(img, 0, 0);
             localStorage.removeItem('canvasData');
             setupColorControls(); // Re-attach color controls
         };
+
+        img.onerror = function() {
+            console.error("Error loading image from localStorage.");
+        };
+
+        console.log("Loading image from localStorage:", savedData.data);
         img.src = savedData.data;
     }
 };
