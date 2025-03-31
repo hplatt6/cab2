@@ -93,7 +93,7 @@ window.onload = function() {
             var scaleX = canvas.width / rect.width;
             var scaleY = canvas.height / rect.height;
             var x = (touch.clientX - rect.left) * scaleX;
-        var y = (touch.clientY - rect.top) * scaleY;
+            var y = (touch.clientY - rect.top) * scaleY;
 
             ctx.lineTo(x, y);
             ctx.stroke();
@@ -187,9 +187,11 @@ window.onload = function() {
     if (localStorage.getItem('canvasData')) {
         var savedData = JSON.parse(localStorage.getItem('canvasData'));
         var img = new Image();
+
+        canvas.width = savedData.width;
+        canvas.height = savedData.height;
+
         img.onload = function() {
-            canvas.width = savedData.width;
-            canvas.height = savedData.height;
             ctx.drawImage(img, 0, 0);
             localStorage.removeItem('canvasData');
             setupColorControls(); // Re-attach color controls
