@@ -16,6 +16,18 @@
         var brushColor = '#000000';
         var brushSize = 5;
 
+        // Generate a UUID
+        function uuidv4() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        // Set the unique ID in the hidden input
+        let uniqueId = uuidv4();
+        document.getElementById('uniqueId').value = uniqueId;
+
         function setCanvasSize() {
             canvas.width = document.getElementById('canvasContainer').offsetWidth;
             canvas.height = canvas.offsetWidth / 3 * 5;
@@ -168,7 +180,7 @@
                     },
                     body: JSON.stringify({
                         imageData: base64Data,
-                        qualtricsId: qualtricsId
+                        uniqueId: uniqueId // Include the unique ID
                     })
                 })
                 .then(response => {
