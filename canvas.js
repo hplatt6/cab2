@@ -1,21 +1,24 @@
 (function() {
+    let uniqueId; // Declare uniqueId in the outer scope
+
     function initCanvas() {
         var canvas = document.getElementById('drawingCanvas');
         if (!canvas) {
             console.error("Canvas element not found!");
             return;
-            // Generate a UUID
+        }
+
+        // Generate a UUID
         function uuidv4() {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
                 var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
                 return v.toString(16);
             });
         }
-        
+
         // Set the unique ID in the hidden input
-        let uniqueId = uuidv4();
+        uniqueId = uuidv4(); // Assign the UUID to the outer scoped variable
         document.getElementById('uniqueId').value = uniqueId;
-        }
 
         var ctx = canvas.getContext('2d');
         if (!ctx) {
@@ -179,7 +182,8 @@
                     },
                     body: JSON.stringify({
                         imageData: base64Data,
-                        uniqueId: uniqueId // Include the unique ID
+                        uniqueId: uniqueId, // Include the unique ID as a separate field
+                        message: `Unique ID: ${uniqueId}` // Add a separate message field
                     })
                 })
                 .then(response => {
