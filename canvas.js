@@ -13,7 +13,7 @@
         }
 
         var isDrawing = false;
-        var brushColor = '#000000';
+        var brushColor = '#000000'; // Default to black
         var brushSize = 5;
 
         // Generate a UUID
@@ -27,6 +27,7 @@
         // Set the unique ID in the hidden input
         let uniqueId = uuidv4();
         document.getElementById('uniqueId').value = uniqueId;
+
 
         function setCanvasSize() {
             canvas.width = document.getElementById('canvasContainer').offsetWidth;
@@ -64,6 +65,7 @@
             return { x: x, y: y };
         }
 
+        // Mouse event listeners
         canvas.addEventListener('mousedown', function(e) {
             isDrawing = true;
             ctx.beginPath();
@@ -87,11 +89,12 @@
             isDrawing = false;
         });
 
-        canvas.addEventListener('mouseout', function() {
+        canvas.addEventListener('mouseout', function(e) {
             isDrawing = false;
         });
 
-        function handleTouchStart(e) {
+        // Touch event listeners
+        canvas.addEventListener('touchstart', function(e) {
             e.preventDefault();
             isDrawing = true;
             ctx.beginPath();
@@ -106,9 +109,9 @@
             ctx.strokeStyle = brushColor;
             ctx.fillStyle = brushColor;
             ctx.lineWidth = brushSize;
-        }
+        }, { passive: false });
 
-        function handleTouchMove(e) {
+        canvas.addEventListener('touchmove', function(e) {
             e.preventDefault();
             if (isDrawing) {
                 var rect = canvas.getBoundingClientRect();
@@ -121,23 +124,26 @@
                 ctx.lineTo(x, y);
                 ctx.stroke();
             }
-        }
+        }, { passive: false });
 
-        function handleTouchEnd() {
+        canvas.addEventListener('touchend', function(e) {
+            e.preventDefault();
             isDrawing = false;
-        }
+        }, { passive: false });
 
-        canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
-        canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
-        canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
-        canvas.addEventListener('touchcancel', handleTouchEnd, { passive: false });
+        canvas.addEventListener('touchcancel', function(e) {
+            e.preventDefault();
+            isDrawing = false;
+        }, { passive: false });
 
+        // Color picker handling
         document.getElementById('colorPicker').addEventListener('input', function() {
             brushColor = this.value;
             ctx.strokeStyle = brushColor;
             ctx.fillStyle = brushColor;
         });
 
+        // Color button click handling
         document.getElementById('colorButtons').addEventListener('click', function(e) {
             if (e.target.tagName === 'BUTTON') {
                 brushColor = e.target.dataset.color;
@@ -146,32 +152,26 @@
             }
         });
 
+        // Brush size slider handling
         document.getElementById('brushSizeSlider').addEventListener('input', function() {
             brushSize = this.value;
-            ctx.lineWidth = brushSize;
+            ctx.lineWidth = size;
         });
 
+        // Clear button handling
         document.getElementById('clearButton').addEventListener('click', function(e) {
             e.preventDefault();
             clearCanvas();
         });
 
-        let qualtricsId = "unknown"; // Default value
-
-        if (typeof Qualtrics !== 'undefined' && typeof Qualtrics.SurveyEngine !== 'undefined') {
-            qualtricsId = Qualtrics.SurveyEngine.getEmbeddedData('qualtricsID'); // Replace 'qualtricsID' with your embedded data name.
-            console.log("Qualtrics ID: ", qualtricsId);
-        } else {
-            console.log("Qualtrics not detected. Using default ID.");
-        }
-
+        // Function to add canvas data to Qualtrics embedded data or return base 64
         function sendBase64ToPipedream() {
             const myCanvas = document.getElementById('drawingCanvas');
             if (myCanvas) {
                 const dataURL = myCanvas.toDataURL('image/png');
                 const base64Data = dataURL.replace(/^data:image\/(png|jpeg);base64,/, '');
 
-                const pipedreamEndpoint = 'https://eo19wfj05vqf6o9.m.pipedream.net';
+                const pipedreamEndpoint = 'https://eo19wfj05vqf6o9.m.pipedream.net'; // Your Pipedream endpoint
 
                 fetch(pipedreamEndpoint, {
                     method: 'POST',
@@ -198,38 +198,19 @@
             }
         }
 
+        // Get the save button element.
         var saveButton = document.getElementById("saveButton");
+
+        // Add event listener to the save button.
         if (saveButton) {
             saveButton.addEventListener("click", sendBase64ToPipedream);
         } else {
             console.error("Save button not found");
         }
 
-        function handleOrientationChange() {
-            console.log("Orientation change detected");
-            if (localStorage.getItem('canvasData')) {
-                var savedData = JSON.parse(localStorage.getItem('canvasData'));
-                var img = new Image();
-
-                img.onload = function() {
-                    console.log("Image loaded, resizing canvas and redrawing");
-                    setTimeout(function() { // Add delay
-                        console.log("Delay finished, resizing canvas and redrawing");
-                        setCanvasSize(); // Resize canvas
-                        ctx.drawImage(img, 0, 0, savedData.width, savedData.height, 0, 0, canvas.width, canvas.height); // Draw scaled image
-                        console.log("Redraw complete");
-                    }, 100); // 100ms delay
-                };
-
-                img.src = savedData.data;
-            } else {
-                console.log("No saved data, resizing canvas");
-                setCanvasSize(); // Just resize if no saved data
-            }
-        }
-
+        // Resize event listener to handle orientation changes
         window.addEventListener('orientationchange', function() {
-            console.log("Saving canvas data to local storage");
+            // Save current canvas data
             localStorage.setItem('canvasData', JSON.stringify({
                 data: canvas.toDataURL(),
                 width: canvas.width,
@@ -238,9 +219,27 @@
             handleOrientationChange();
         });
 
+        function handleOrientationChange() {
+            if (localStorage.getItem('canvasData')) {
+                var savedData = JSON.parse(localStorage.getItem('canvasData'));
+                var img = new Image();
+
+                img.onload = function() {
+                    setCanvasSize(); // Resize canvas
+                    ctx.drawImage(img, 0, 0, savedData.width, savedData.height, 0, 0, canvas.width, canvas.height); // Draw scaled image
+                };
+
+                img.src = savedData.data;
+                localStorage.removeItem('canvasData');
+            } else {
+                setCanvasSize(); // Just resize if no saved data
+            }
+        }
+
+
+        // Restore canvas data on initial load
         if (localStorage.getItem('canvasData')) {
-            console.log("Restoring canvas data on initial load");
-            handleOrientationChange(); // Restore on initial load
+            handleOrientationChange();
         }
     }
 
