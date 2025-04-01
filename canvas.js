@@ -11,7 +11,7 @@
                 return v.toString(16);
             });
         }
-
+        
         // Set the unique ID in the hidden input
         let uniqueId = uuidv4();
         document.getElementById('uniqueId').value = uniqueId;
