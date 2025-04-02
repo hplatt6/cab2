@@ -6,22 +6,16 @@
             return;
         }
 
-        // Extract uniqueId from URL parameter - add proper error handling
-        function getUniqueIdFromUrl() {
-            try {
-                const urlParams = new URLSearchParams(window.location.search);
-                const id = urlParams.get('uniqueId');
-                console.log("Retrieved uniqueId from URL:", id);
-                return id;
-            } catch (e) {
-                console.error("Error extracting uniqueId from URL:", e);
-                return null;
-            }
-        }
+        // Near the top of your initCanvas function, add:
+let uniqueId = null;
 
-        // Get uniqueId from URL - variable declaration needs to be at this scope level
-        let uniqueId = getUniqueIdFromUrl();
-        console.log("Using uniqueId:", uniqueId);
+// Add message listener to receive uniqueId from parent
+window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'setUniqueId') {
+        console.log("Received uniqueId from parent:", event.data.uniqueId);
+        uniqueId = event.data.uniqueId;
+    }
+}, false);
 
         var ctx = canvas.getContext('2d');
         if (!ctx) {
