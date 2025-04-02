@@ -6,20 +6,16 @@
             return;
         }
 
-        // Extract uniqueId from URL parameter
-        function getUniqueIdFromUrl() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('uniqueId'); // Strictly retrieve uniqueId from URL
-        }
+// Extract uniqueId from URL parameter
+function getUniqueIdFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('uniqueId');
+}
 
-        // Set the unique ID in the hidden input
-        let uniqueId = getUniqueIdFromUrl();
-        const uniqueIdInput = document.getElementById('uniqueId');
-        if (uniqueIdInput) {
-            uniqueIdInput.value = uniqueId;
-        } else {
-            console.error("Hidden input field for uniqueId not found or value is empty.");
-        }
+// Just get the uniqueId from URL - no need to set it in a hidden field
+let uniqueId = getUniqueIdFromUrl();
+
+// Use uniqueId directly in your Pipedream POST request
 
         var ctx = canvas.getContext('2d');
         if (!ctx) {
