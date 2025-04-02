@@ -6,16 +6,14 @@
             return;
         }
 
-        // Generate a UUID
-        function uuidv4() {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
+        // Extract uniqueId from URL parameter
+        function getUniqueIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('uniqueId'); // No fallback, strictly uses URL parameter
         }
 
         // Set the unique ID in the hidden input
-        let uniqueId = uuidv4();
+        let uniqueId = getUniqueIdFromUrl();
         const uniqueIdInput = document.getElementById('uniqueId');
         if (uniqueIdInput) {
             uniqueIdInput.value = uniqueId;
@@ -203,50 +201,7 @@
             }
         }
 
-        var saveButton = document.getElementById("saveButton");
-        if (saveButton) {
-            saveButton.addEventListener("click", sendBase64ToPipedream);
-        } else {
-            console.error("Save button not found");
-        }
-
-        function handleOrientationChange() {
-            console.log("Orientation change detected");
-            if (localStorage.getItem('canvasData')) {
-                var savedData = JSON.parse(localStorage.getItem('canvasData'));
-                var img = new Image();
-
-                img.onload = function() {
-                    console.log("Image loaded, resizing canvas and redrawing");
-                    setTimeout(function() { // Add delay
-                        console.log("Delay finished, resizing canvas and redrawing");
-                        setCanvasSize(); // Resize canvas
-                        ctx.drawImage(img, 0, 0, savedData.width, savedData.height, 0, 0, canvas.width, canvas.height); // Draw scaled image
-                        console.log("Redraw complete");
-                    }, 100); // 100ms delay
-                };
-
-                img.src = savedData.data;
-            } else {
-                console.log("No saved data, resizing canvas");
-                setCanvasSize(); // Just resize if no saved data
-            }
-        }
-
-        window.addEventListener('orientationchange', function() {
-            console.log("Saving canvas data to local storage");
-            localStorage.setItem('canvasData', JSON.stringify({
-                data: canvas.toDataURL(),
-                width: canvas.width,
-                height: canvas.height
-            }));
-            handleOrientationChange();
-        });
-
-        if (localStorage.getItem('canvasData')) {
-            console.log("Restoring canvas data on initial load");
-            handleOrientationChange(); // Restore on initial load
-        }
+       ...
     }
 
     initCanvas();
