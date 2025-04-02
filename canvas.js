@@ -6,16 +6,22 @@
             return;
         }
 
-// Extract uniqueId from URL parameter
-function getUniqueIdFromUrl() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('uniqueId');
-}
+        // Extract uniqueId from URL parameter - add proper error handling
+        function getUniqueIdFromUrl() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const id = urlParams.get('uniqueId');
+                console.log("Retrieved uniqueId from URL:", id);
+                return id;
+            } catch (e) {
+                console.error("Error extracting uniqueId from URL:", e);
+                return null;
+            }
+        }
 
-// Just get the uniqueId from URL - no need to set it in a hidden field
-let uniqueId = getUniqueIdFromUrl();
-
-// Use uniqueId directly in your Pipedream POST request
+        // Get uniqueId from URL - variable declaration needs to be at this scope level
+        let uniqueId = getUniqueIdFromUrl();
+        console.log("Using uniqueId:", uniqueId);
 
         var ctx = canvas.getContext('2d');
         if (!ctx) {
@@ -163,6 +169,7 @@ let uniqueId = getUniqueIdFromUrl();
             console.log("Qualtrics not detected. Using default ID.");
         }
 
+        // Modified sendBase64ToPipedream function
         function sendBase64ToPipedream() {
             const myCanvas = document.getElementById('drawingCanvas');
             if (myCanvas) {
@@ -170,6 +177,8 @@ let uniqueId = getUniqueIdFromUrl();
                 const base64Data = dataURL.replace(/^data:image\/(png|jpeg);base64,/, '');
 
                 const pipedreamEndpoint = 'https://eo19wfj05vqf6o9.m.pipedream.net';
+                
+                console.log("Sending to Pipedream with uniqueId:", uniqueId);
 
                 fetch(pipedreamEndpoint, {
                     method: 'POST',
@@ -178,7 +187,7 @@ let uniqueId = getUniqueIdFromUrl();
                     },
                     body: JSON.stringify({
                         imageData: base64Data,
-                        uniqueId: uniqueId // Include the unique ID
+                        uniqueId: uniqueId || "missing-id" // Provide fallback
                     })
                 })
                 .then(response => {
@@ -195,6 +204,7 @@ let uniqueId = getUniqueIdFromUrl();
                 console.error('Canvas element not found.');
             }
         }
+
 
         var saveButton = document.getElementById("saveButton");
         if (saveButton) {
