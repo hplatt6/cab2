@@ -187,6 +187,20 @@ window.addEventListener('message', function(event) {
                 .then(response => {
                     if (response.ok) {
                         console.log('Base64 data sent to Pipedream successfully!');
+                        
+                        // Show save message
+                        const msg = document.getElementById('saveMessage');
+                        if (msg) {
+                            msg.style.display = 'block';
+                            msg.style.opacity = '1';
+                    
+                            setTimeout(() => {
+                                msg.style.opacity = '0';
+                                setTimeout(() => {
+                                    msg.style.display = 'none';
+                                }, 500); // Match transition time
+                            }, 2000); // Show message for 2 seconds
+                        }
                     } else {
                         console.error('Failed to send Base64 data to Pipedream.');
                     }
