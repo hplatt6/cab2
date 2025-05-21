@@ -6,19 +6,19 @@
       return;
     }
 
-    let masterid = null;
+    let uniqueId = null;
 
     // 1️⃣ Message listener for parent iframe communication
     window.addEventListener('message', function (event) {
-      if (event.data && event.data.type === 'setmasterid') {
-        console.log("✅ Received masterid from parent:", event.data.masterid);
-        masterid = event.data.masterid;
-        localStorage.setItem('cachedmasterid', masterid);
+      if (event.data && event.data.type === 'setuniqueId') {
+        console.log("✅ Received uniqueId from parent:", event.data.uniqueId);
+        uniqueId = event.data.uniqueId;
+        localStorage.setItem('cacheduniqueId', uniqueId);
       }
     }, false);
 
-    // 2️⃣ Robust fallback to retrieve masterid
-    function tryToGetmasterid() {
+    // 2️⃣ Robust fallback to retrieve uniqueId
+    function tryToGetuniqueId() {
       let attempts = 0;
       const maxAttempts = 10;
       const intervalMs = 500;
@@ -26,50 +26,50 @@
       function check() {
         attempts++;
 
-        if (!masterid && typeof Qualtrics !== 'undefined' && Qualtrics.SurveyEngine) {
-          const qid = Qualtrics.SurveyEngine.getEmbeddedData('masterid');
+        if (!uniqueId && typeof Qualtrics !== 'undefined' && Qualtrics.SurveyEngine) {
+          const qid = Qualtrics.SurveyEngine.getEmbeddedData('uniqueId');
           if (qid) {
-            console.log(`[✔] Found masterid from Qualtrics: ${qid}`);
-            masterid = qid;
-            localStorage.setItem('cachedmasterid', masterid);
+            console.log(`[✔] Found uniqueId from Qualtrics: ${qid}`);
+            uniqueId = qid;
+            localStorage.setItem('cacheduniqueId', uniqueId);
             return;
           }
         }
 
-        if (!masterid) {
+        if (!uniqueId) {
           const urlParams = new URLSearchParams(window.location.search);
-          const urlId = urlParams.get('masterid');
+          const urlId = urlParams.get('uniqueId');
           if (urlId) {
-            console.log(`[✔] Found masterid from URL: ${urlId}`);
-            masterid = urlId;
-            localStorage.setItem('cachedmasterid', masterid);
+            console.log(`[✔] Found uniqueId from URL: ${urlId}`);
+            uniqueId = urlId;
+            localStorage.setItem('cacheduniqueId', uniqueId);
             return;
           }
         }
 
-        if (!masterid) {
-          const stored = localStorage.getItem('cachedmasterid');
+        if (!uniqueId) {
+          const stored = localStorage.getItem('cacheduniqueId');
           if (stored) {
-            console.log(`[✔] Found masterid from localStorage: ${stored}`);
-            masterid = stored;
+            console.log(`[✔] Found uniqueId from localStorage: ${stored}`);
+            uniqueId = stored;
             return;
           }
         }
 
-        if (masterid) return;
+        if (uniqueId) return;
 
         if (attempts < maxAttempts) {
-          console.warn(`[!] masterid not yet found, retrying... (${attempts}/${maxAttempts})`);
+          console.warn(`[!] uniqueId not yet found, retrying... (${attempts}/${maxAttempts})`);
           setTimeout(check, intervalMs);
         } else {
-          console.error(`[✖] Failed to retrieve masterid. Using "missing-id".`);
+          console.error(`[✖] Failed to retrieve uniqueId. Using "missing-id".`);
         }
       }
 
       check();
     }
 
-    tryToGetmasterid();
+    tryToGetuniqueId();
 
     const ctx = canvas.getContext('2d');
     if (!ctx) {
@@ -209,14 +209,14 @@
       const pipedreamEndpoint = 'https://eo19wfj05vqf6o9.m.pipedream.net';
 
       console.log("📤 Sending drawing to Pipedream...");
-      console.log("📎 masterid:", masterid || "missing-id");
+      console.log("📎 uniqueId:", uniqueId || "missing-id");
 
       fetch(pipedreamEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           imageData: base64Data,
-          masterid: masterid || "missing-id"
+          uniqueId: uniqueId || "missing-id"
         })
       })
         .then(response => {
